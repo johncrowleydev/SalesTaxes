@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35004.147
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesTaxes", "SalesTaxes\SalesTaxes.csproj", "{502C167A-DE55-46FA-B668-7963D2759A51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesTaxes.Configuration", "SalesTaxes.Configuration\SalesTaxes.Configuration.csproj", "{8F95241E-E1BD-42C1-8D16-7C7A801B1C75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesTaxes.Contracts.Services", "SalesTaxes.Contracts.Services\SalesTaxes.Contracts.Services.csproj", "{1E930308-5199-4C36-B149-1416665653B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesTaxes.Services", "SalesTaxes.Services\SalesTaxes.Services.csproj", "{0854B140-A7D9-4571-9662-A427E386855C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesTaxes.Common", "SalesTaxes.Common\SalesTaxes.Common.csproj", "{993D07F4-0407-4AB1-A398-1C006B223BB5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SalesTaxes.Tests", "SalesTaxes.Tests\SalesTaxes.Tests.csproj", "{650757CD-CA95-426C-AA60-02FF725342A3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{502C167A-DE55-46FA-B668-7963D2759A51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{502C167A-DE55-46FA-B668-7963D2759A51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{502C167A-DE55-46FA-B668-7963D2759A51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{502C167A-DE55-46FA-B668-7963D2759A51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F95241E-E1BD-42C1-8D16-7C7A801B1C75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F95241E-E1BD-42C1-8D16-7C7A801B1C75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F95241E-E1BD-42C1-8D16-7C7A801B1C75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F95241E-E1BD-42C1-8D16-7C7A801B1C75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E930308-5199-4C36-B149-1416665653B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E930308-5199-4C36-B149-1416665653B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E930308-5199-4C36-B149-1416665653B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E930308-5199-4C36-B149-1416665653B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0854B140-A7D9-4571-9662-A427E386855C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0854B140-A7D9-4571-9662-A427E386855C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0854B140-A7D9-4571-9662-A427E386855C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0854B140-A7D9-4571-9662-A427E386855C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{993D07F4-0407-4AB1-A398-1C006B223BB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{993D07F4-0407-4AB1-A398-1C006B223BB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{993D07F4-0407-4AB1-A398-1C006B223BB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{993D07F4-0407-4AB1-A398-1C006B223BB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{650757CD-CA95-426C-AA60-02FF725342A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{650757CD-CA95-426C-AA60-02FF725342A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{650757CD-CA95-426C-AA60-02FF725342A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{650757CD-CA95-426C-AA60-02FF725342A3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6644F6C-CF2B-420C-907C-A2CFD65C62B6}
+	EndGlobalSection
+EndGlobal
