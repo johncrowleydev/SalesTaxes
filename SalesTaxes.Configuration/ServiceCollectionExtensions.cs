@@ -8,8 +8,6 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection ConfigureServices(this IServiceCollection services)
     {
-        services.AddSingleton<IApp, App>();
-
         services.AddSingleton<ICartService, CartService>();
         services.AddSingleton<IInventoryService, InventoryService>();
         services.AddSingleton<ISalesTaxService, SalesTaxService>();

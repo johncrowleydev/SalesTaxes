@@ -2,9 +2,9 @@
 using SalesTaxes.Common.Enums;
 using SalesTaxes.Contracts.Services;
 
-namespace SalesTaxes.Services;
+namespace SalesTaxes;
 
-public class App : IApp
+internal class App
 {
     private readonly ICartService _cartService;
     private readonly IInventoryService _inventoryService;
@@ -221,7 +221,7 @@ public class App : IApp
         var inventory = _inventoryService.ListInventory();
         DisplayInventoryList(inventory);
         Console.Write("Enter the number of the product you want to remove: ");
-        
+
         int index;
         if (int.TryParse(Console.ReadLine(), out index) && index > 0 && index <= inventory.Count)
         {

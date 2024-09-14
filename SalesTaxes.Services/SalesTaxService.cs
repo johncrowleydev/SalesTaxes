@@ -21,7 +21,7 @@ public class SalesTaxService : ISalesTaxService
         return RoundUpToNearestFiveCents(salesTax);
     }
 
-    private static decimal RoundUpToNearestFiveCents(decimal value)
+    public static decimal RoundUpToNearestFiveCents(decimal value)
     {
         return Math.Ceiling(value / TAX_ROUNDING) * TAX_ROUNDING;
     }
