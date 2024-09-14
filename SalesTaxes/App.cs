@@ -235,7 +235,7 @@ internal class App
         Console.ReadLine();
     }
 
-    private static void ResetConsole()
+    private void ResetConsole()
     {
         Console.Clear();
         Console.WriteLine(@"
@@ -248,6 +248,9 @@ internal class App
                                                       
  by John Crowley
 ");
+
+        var cartItemsCount = _cartService.GetCartItemsCount();
+        Console.WriteLine($"You have {cartItemsCount} items in your cart.\n");
     }
 
     public void ViewInventory()

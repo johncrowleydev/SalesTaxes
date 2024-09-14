@@ -23,8 +23,28 @@ public class CartService : ICartService
         _cartItems.Clear();
     }
 
+    public int GetCartItemsCount()
+    {
+        return _cartItems.Sum(item => item.Quantity);
+    }
+
     public IList<CartItemDTO> ListCartItems() 
     {
         return _cartItems;
+    }
+
+    public void RemoveCartItem(Guid id)
+    {
+        var item = _cartItems.FirstOrDefault(x => x.Id == id) ?? throw new ApplicationException("No cart item found with the given id.");
+        _cartItems.Remove(item);
+    }
+
+    public CartItemDTO UpdateItemQuantity(Guid id, int quantity)
+    {
+        var item = _cartItems.FirstOrDefault(x => x.Id == id) ?? throw new ApplicationException("No cart item found with the given id.");
+        var updatedItem = new CartItemDTO(item.Product, quantity);
+        _cartItems.Remove(item);
+        _cartItems.Add(updatedItem);
+        return updatedItem;
     }
 }
