@@ -40,8 +40,10 @@ internal class App
                 Console.Write("Enter the quantity: ");
                 if (int.TryParse(Console.ReadLine(), out int quantity) && quantity > 0)
                 {
-                    _cartService.AddCartItem(new CartItemDTO(inventory[index - 1], quantity));
-                    Console.WriteLine($"{quantity} of {inventory[index - 1].Name} added to cart.");
+                    var item = inventory[index - 1] ?? throw new ApplicationException("Product not found.");
+                    var product = item.Product;
+                    _cartService.AddCartItem(new CartItemDTO(product, quantity));
+                    Console.WriteLine($"{quantity} of {product.Name} added to cart.");
                 }
                 else
                 {
@@ -96,7 +98,7 @@ internal class App
             _ => ProductCategory.General,
         };
 
-        _inventoryService.CreateInventory(new ProductDTO(name, price, isImported, category));
+        _inventoryService.CreateInventory(new InventoryItemDTO(new ProductDTO(name, price, isImported, category), 1));
         Console.WriteLine("Product added to inventory. Press Enter to continue...");
         Console.ReadLine();
     }
@@ -126,7 +128,6 @@ internal class App
             decimal salesTaxPerItem = _salesTaxService.CalculateSalesTax(item.Product, isTaxFreeState);
             decimal itemTotalPricePerUnit = item.Product.Price + salesTaxPerItem;
 
-            // Multiply by the quantity of the item
             decimal itemTotalPrice = itemTotalPricePerUnit * item.Quantity;
             decimal itemTotalSalesTax = salesTaxPerItem * item.Quantity;
 
@@ -144,12 +145,78 @@ internal class App
         Console.ReadLine();
     }
 
-    private static void DisplayInventoryList(IList<ProductDTO> inventory)
+    private static void DisplayInventoryList(IList<InventoryItemDTO> inventory)
     {
         for (int i = 0; i < inventory.Count; i++)
         {
-            var product = inventory[i];
-            Console.WriteLine($"{i + 1}. {product.Name} - {product.Price:C2} - {(product.IsImported ? "Imported" : "Domestic")} - {product.Category}");
+            var item = inventory[i];
+            var product = item.Product;
+            Console.WriteLine($"{i + 1}. {product.Name} - {product.Price:C2} - {(product.IsImported ? "Imported" : "Domestic")} - {product.Category} - {item.Quantity} In Stock");
+        }
+    }
+
+    private void EditProductDetails()
+    {
+        ResetConsole();
+        Console.WriteLine("=== EDIT PRODUCT DETAILS ===");
+        var inventory = _inventoryService.ListInventory();
+        DisplayInventoryList(inventory);
+        Console.Write("Enter the number of the product you want to edit: ");
+
+        if (int.TryParse(Console.ReadLine(), out int index) && index > 0 && index <= inventory.Count)
+        {
+            var existingItem = inventory[index - 1];
+            if (existingItem == null) throw new ApplicationException("");
+
+            // Prompt user for new product details
+            Console.WriteLine($"Current Name: {existingItem.Product.Name}");
+            Console.Write("Enter new name (or press Enter to keep the current name): ");
+            var newName = Console.ReadLine();
+            newName = string.IsNullOrEmpty(newName) ? existingItem.Product.Name : newName;
+
+            Console.WriteLine($"Current Price: {existingItem.Product.Price:C}");
+            Console.Write("Enter new price (or press Enter to keep the current price): ");
+            var priceInput = Console.ReadLine();
+            decimal newPrice = string.IsNullOrEmpty(priceInput) ? existingItem.Product.Price : decimal.Parse(priceInput);
+
+            Console.WriteLine($"Is Imported (true/false): {existingItem.Product.IsImported}");
+            Console.Write("Enter 'true' or 'false' to update import status (or press Enter to keep the current value): ");
+            var importInput = Console.ReadLine();
+            bool isImported = string.IsNullOrEmpty(importInput) ? existingItem.Product.IsImported : bool.Parse(importInput);
+
+            Console.WriteLine($"Current Category: {existingItem.Product.Category}");
+            Console.WriteLine("Choose new category (0 = General, 1 = Food, 2 = Medical, 3 = Book) or press Enter to keep current:");
+            var categoryInput = Console.ReadLine();
+            var newCategory = string.IsNullOrEmpty(categoryInput)
+                ? existingItem.Product.Category
+                : (ProductCategory)Enum.Parse(typeof(ProductCategory), categoryInput);
+
+            Console.WriteLine($"Current Quantity: {existingItem.Quantity}");
+            Console.Write("Enter new quantity (or press Enter to keep the current quantity): ");
+            var quantityInput = Console.ReadLine();
+            int newQuantity = string.IsNullOrEmpty(quantityInput) ? existingItem.Quantity : int.Parse(quantityInput);
+
+            // Create the updated product and inventory item
+            var updatedProduct = new ProductDTO(newName, newPrice, isImported, newCategory, existingItem.Product.Id);
+            var updatedItem = new InventoryItemDTO(updatedProduct, newQuantity, existingItem.Id);
+
+            // Update the inventory
+            try
+            {
+                _inventoryService.UpdateInventoryItem(updatedItem);
+                Console.WriteLine("Product details updated successfully.");
+            }
+            catch (ArgumentException ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
+            Console.WriteLine("Press Enter to continue...");
+            Console.ReadLine();
+        }
+        else
+        {
+            Console.WriteLine("Invalid product number. Please try again.");
         }
     }
 
@@ -162,7 +229,7 @@ internal class App
         Console.WriteLine("3. View Cart and Checkout");
         Console.WriteLine("4. Manage Product Inventory");
         Console.WriteLine("5. Exit");
-        Console.Write("Choose an option: ");
+        Console.Write("\nChoose an option: ");
         var choice = Console.ReadLine();
 
         switch (choice)
@@ -195,8 +262,9 @@ internal class App
         Console.WriteLine("=== MANAGE INVENTORY ===");
         Console.WriteLine("1. Add Product");
         Console.WriteLine("2. Remove Product");
-        Console.WriteLine("3. Return to Main Menu");
-        Console.Write("Choose an option: ");
+        Console.WriteLine("3. Edit Product Details");
+        Console.WriteLine("4. Return to Main Menu");
+        Console.Write("\nChoose an option: ");
         var choice = Console.ReadLine();
 
         switch (choice)
@@ -208,6 +276,9 @@ internal class App
                 RemoveProduct();
                 break;
             case "3":
+                EditProductDetails();
+                break;
+            case "4":
                 return;
             default:
                 Console.WriteLine("Invalid option. Press Enter to continue...");
@@ -250,6 +321,9 @@ internal class App
 ");
 
         var cartItemsCount = _cartService.GetCartItemsCount();
+        var inventoryProductCount = _inventoryService.GetInventoryProductCount();
+        var inventoryTotalCount = _inventoryService.GetInventoryTotalCount();
+        Console.WriteLine($"Store has {inventoryProductCount} products and {inventoryTotalCount} total items in inventory.");
         Console.WriteLine($"You have {cartItemsCount} items in your cart.\n");
     }
 

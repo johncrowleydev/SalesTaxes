@@ -4,15 +4,15 @@ namespace SalesTaxes.Common.DTOs;
 
 public class ProductDTO
 {
-    public Guid Id { get; }
+    public Guid Id { get; private set;  }
     public string Name { get; }
     public decimal Price { get; }
     public bool IsImported { get; }
     public ProductCategory Category { get; }
 
-    public ProductDTO(string name, decimal price, bool isImported, ProductCategory category)
+    public ProductDTO(string name, decimal price, bool isImported, ProductCategory category, Guid? id = null)
     {
-        Id = Guid.NewGuid();
+        Id = id ?? Guid.NewGuid();
         Name = name;
         Price = price;
         IsImported = isImported;

@@ -39,7 +39,7 @@ public class CartService : ICartService
         _cartItems.Remove(item);
     }
 
-    public CartItemDTO UpdateItemQuantity(Guid id, int quantity)
+    public CartItemDTO UpdateCartItemQuantity(Guid id, int quantity)
     {
         var item = _cartItems.FirstOrDefault(x => x.Id == id) ?? throw new ApplicationException("No cart item found with the given id.");
         var updatedItem = new CartItemDTO(item.Product, quantity);

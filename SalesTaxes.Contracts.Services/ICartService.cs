@@ -9,5 +9,5 @@ public interface ICartService
     int GetCartItemsCount();
     IList<CartItemDTO> ListCartItems();
     void RemoveCartItem(Guid id);
-    CartItemDTO UpdateItemQuantity(Guid id, int quantity);
+    CartItemDTO UpdateCartItemQuantity(Guid id, int quantity);
 }
