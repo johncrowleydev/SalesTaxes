@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ICartService, CartService>();
         services.AddSingleton<IInventoryService, InventoryService>();
         services.AddSingleton<ISalesTaxService, SalesTaxService>();
+        services.AddSingleton<ISessionService, SessionService>();
 
         return services;
     }

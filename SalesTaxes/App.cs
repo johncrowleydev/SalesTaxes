@@ -9,16 +9,19 @@ internal class App
     private readonly ICartService _cartService;
     private readonly IInventoryService _inventoryService;
     private readonly ISalesTaxService _salesTaxService;
+    private readonly ISessionService _sessionService;
 
-    public App(ICartService cartService, IInventoryService inventoryService, ISalesTaxService salesTaxService)
+    public App(ICartService cartService, IInventoryService inventoryService, ISalesTaxService salesTaxService, ISessionService sessionService)
     {
         _cartService = cartService;
         _inventoryService = inventoryService;
         _salesTaxService = salesTaxService;
+        _sessionService = sessionService;
     }
 
     public void Run()
     {
+        InitSession();
         while (true)
         {
             MainMenu();
@@ -220,6 +223,35 @@ internal class App
         }
     }
 
+    private void InitSession()
+    {
+        Console.WriteLine("\n=== LOGIN ===\n");
+
+        string? username;
+        do
+        {
+            Console.Write("Enter a username to login: ");
+            username = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                Console.WriteLine("Username cannot be empty. Please try again.");
+            }
+        } while (string.IsNullOrWhiteSpace(username));
+
+        string? state;
+        do
+        {
+            Console.Write("Enter your state: ");
+            state = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(state))
+            {
+                Console.WriteLine("State cannot be empty. Please try again.");
+            }
+        } while (string.IsNullOrWhiteSpace(state));
+
+        _sessionService.SetCurrentUser(new UserDTO(username, state));
+    }
+
     private void MainMenu()
     {
         ResetConsole();
@@ -323,6 +355,8 @@ internal class App
         var cartItemsCount = _cartService.GetCartItemsCount();
         var inventoryProductCount = _inventoryService.GetInventoryProductCount();
         var inventoryTotalCount = _inventoryService.GetInventoryTotalCount();
+        var currentUser = _sessionService.GetCurrentUser();
+        Console.WriteLine($"Welcome, {currentUser.Name} in {currentUser.State}!");
         Console.WriteLine($"Store has {inventoryProductCount} products and {inventoryTotalCount} total items in inventory.");
         Console.WriteLine($"You have {cartItemsCount} items in your cart.\n");
     }
