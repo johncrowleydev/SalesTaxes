@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SalesTaxes;
 using SalesTaxes.Configuration;
-using SalesTaxes.Contracts.Services;
 
 var serviceCollection = new ServiceCollection();
 serviceCollection.AddSingleton<App>();
