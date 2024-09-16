@@ -9,8 +9,17 @@ public class SalesTaxService : ISalesTaxService
     const decimal IMPORT_DUTY_RATE = 0.05m;
     const decimal TAX_ROUNDING = 0.05m;
 
-    public decimal CalculateSalesTax(ProductDTO product, bool isTaxFreeState)
+    private readonly ISessionService _sessionService;
+
+    public SalesTaxService(ISessionService sessionService)
     {
+        _sessionService = sessionService;
+    }
+
+    public decimal CalculateSalesTax(ProductDTO product)
+    {
+        var currentUser = _sessionService.GetCurrentUser();
+        var isTaxFreeState = currentUser.State.StartsWith("m", StringComparison.OrdinalIgnoreCase);
         if (isTaxFreeState) return 0;
 
         decimal taxRate = 0;

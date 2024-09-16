@@ -1,14 +1,17 @@
 ﻿using SalesTaxes.Common.DTOs;
 using SalesTaxes.Contracts.Services;
+using System.Reflection.Metadata.Ecma335;
 
 namespace SalesTaxes.Services;
 
 public class CartService : ICartService
 {
+    private readonly ISalesTaxService _salesTaxService;
     private readonly List<CartItemDTO> _cartItems;
 
-    public CartService()
+    public CartService(ISalesTaxService salesTaxService)
     {
+        _salesTaxService = salesTaxService;
         _cartItems = [];
     }
 
@@ -21,6 +24,17 @@ public class CartService : ICartService
     public void ClearCartItems()
     {
         _cartItems.Clear();
+    }
+
+    public ReceiptDTO GenerateReceipt()
+    {
+        var receipt = new ReceiptDTO();
+        foreach (var item in _cartItems)
+        {
+            var salesTaxPerItem = _salesTaxService.CalculateSalesTax(item.Product);
+            receipt.LineItems.Add(new ReceiptLineItemDTO(item.Product, item.Quantity, salesTaxPerItem));
+        }
+        return receipt;
     }
 
     public int GetCartItemsCount()

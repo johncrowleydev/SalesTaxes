@@ -108,44 +108,56 @@ internal class App
 
     private void Checkout()
     {
-        ResetConsole();
-        var cart = _cartService.ListCartItems();
+        //ResetConsole();
+        //var cart = _cartService.ListCartItems();
 
-        if (!cart.Any())
+        //if (!cart.Any())
+        //{
+        //    Console.WriteLine("Cart is empty. Press Enter to return...");
+        //    Console.ReadLine();
+        //    return;
+        //}
+
+        //Console.Write("Enter your state: ");
+        //var state = Console.ReadLine();
+        //var isTaxFreeState = state?.StartsWith("M", StringComparison.OrdinalIgnoreCase) ?? false;
+
+        //decimal totalSalesTaxes = 0;
+        //decimal totalCost = 0;
+
+        //Console.WriteLine("=== Receipt ===");
+        //foreach (var item in cart)
+        //{
+        //    decimal salesTaxPerItem = _salesTaxService.CalculateSalesTax(item.Product, isTaxFreeState);
+        //    decimal itemTotalPricePerUnit = item.Product.Price + salesTaxPerItem;
+
+        //    decimal itemTotalPrice = itemTotalPricePerUnit * item.Quantity;
+        //    decimal itemTotalSalesTax = salesTaxPerItem * item.Quantity;
+
+        //    totalSalesTaxes += itemTotalSalesTax;
+        //    totalCost += itemTotalPrice;
+
+        //    Console.WriteLine($"{item.Quantity} x {item.Product.Name}: {itemTotalPrice:C2} ({item.Quantity} @ {itemTotalPricePerUnit:C2} each)");
+        //}
+
+        //Console.WriteLine($"Sales Taxes: {totalSalesTaxes:C2}");
+        //Console.WriteLine($"Total: {totalCost:C2}");
+
+        //_cartService.ClearCartItems();
+        //Console.WriteLine("Press Enter to return...");
+        //Console.ReadLine();
+    }
+
+    private static void DisplayCartList(IList<CartItemDTO> cart, bool showLineNumbers = false)
+    {
+        for (int i = 0; i < cart.Count; i++)
         {
-            Console.WriteLine("Cart is empty. Press Enter to return...");
-            Console.ReadLine();
-            return;
+            var item = cart[i];
+            var product = item.Product;
+            decimal itemTotalPrice = product.Price * item.Quantity;
+            if (showLineNumbers) Console.Write($"{i + 1}. ");
+            Console.WriteLine($"{item.Quantity} x {item.Product.Name}: {itemTotalPrice:C2} ({item.Quantity} @ {product.Price:C2} each)");
         }
-
-        Console.Write("Enter your state: ");
-        var state = Console.ReadLine();
-        var isTaxFreeState = state?.StartsWith("M", StringComparison.OrdinalIgnoreCase) ?? false;
-
-        decimal totalSalesTaxes = 0;
-        decimal totalCost = 0;
-
-        Console.WriteLine("=== Receipt ===");
-        foreach (var item in cart)
-        {
-            decimal salesTaxPerItem = _salesTaxService.CalculateSalesTax(item.Product, isTaxFreeState);
-            decimal itemTotalPricePerUnit = item.Product.Price + salesTaxPerItem;
-
-            decimal itemTotalPrice = itemTotalPricePerUnit * item.Quantity;
-            decimal itemTotalSalesTax = salesTaxPerItem * item.Quantity;
-
-            totalSalesTaxes += itemTotalSalesTax;
-            totalCost += itemTotalPrice;
-
-            Console.WriteLine($"{item.Quantity} x {item.Product.Name}: {itemTotalPrice:C2} ({item.Quantity} @ {itemTotalPricePerUnit:C2} each)");
-        }
-
-        Console.WriteLine($"Sales Taxes: {totalSalesTaxes:C2}");
-        Console.WriteLine($"Total: {totalCost:C2}");
-
-        _cartService.ClearCartItems();
-        Console.WriteLine("Press Enter to return...");
-        Console.ReadLine();
     }
 
     private static void DisplayInventoryList(IList<InventoryItemDTO> inventory)
@@ -156,6 +168,45 @@ internal class App
             var product = item.Product;
             Console.WriteLine($"{i + 1}. {product.Name} - {product.Price:C2} - {(product.IsImported ? "Imported" : "Domestic")} - {product.Category} - {item.Quantity} In Stock");
         }
+    }
+
+    private void EditCartItemQuantity()
+    {
+        bool editMoreItems = true;
+
+        while (editMoreItems)
+        {
+            ResetConsole();
+            var cart = _cartService.ListCartItems();
+            DisplayCartList(cart, true);
+            Console.Write("Enter the number of the item you want to edit: ");
+            if (int.TryParse(Console.ReadLine(), out int index) && index > 0 && index <= cart.Count)
+            {
+                Console.Write("Enter the quantity: ");
+                if (int.TryParse(Console.ReadLine(), out int quantity) && quantity > 0)
+                {
+                    var item = cart[index - 1] ?? throw new ApplicationException("Item not found.");
+                    var product = item.Product;
+                    _cartService.UpdateCartItemQuantity(item.Id, quantity);
+                    Console.WriteLine($"Cart has been updated.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid quantity. Please enter a positive number.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid item number. Please try again.");
+            }
+
+            Console.Write("Would you like to edit another item? (y/n): ");
+            var input = Console.ReadLine();
+            editMoreItems = input?.ToLower() == "y";
+        }
+
+        Console.WriteLine("Finished editing items. Press Enter to continue...");
+        Console.ReadLine();
     }
 
     private void EditProductDetails()
@@ -258,7 +309,7 @@ internal class App
         Console.WriteLine("=== MAIN MENU ===");
         Console.WriteLine("1. View Product Inventory");
         Console.WriteLine("2. Add Items to Cart");
-        Console.WriteLine("3. View Cart and Checkout");
+        Console.WriteLine("3. View/Edit Cart and Checkout");
         Console.WriteLine("4. Manage Product Inventory");
         Console.WriteLine("5. Exit");
         Console.Write("\nChoose an option: ");
@@ -273,7 +324,7 @@ internal class App
                 AddItemsToCart();
                 break;
             case "3":
-                Checkout();
+                ViewOrEditCart();
                 break;
             case "4":
                 ManageInventory();
@@ -317,6 +368,26 @@ internal class App
                 Console.ReadLine();
                 break;
         }
+    }
+
+    private void RemoveCartItem()
+    {
+        ResetConsole();
+        var cart = _cartService.ListCartItems();
+        DisplayCartList(cart, true);
+        Console.Write("Enter the number of the item you want to remove: ");
+        if (int.TryParse(Console.ReadLine(), out int index) && index > 0 && index <= cart.Count)
+        {
+            var item = cart[index - 1];
+            _cartService.RemoveCartItem(item.Id);
+            Console.WriteLine("Cart has been updated.");
+        }
+        else
+        {
+            Console.WriteLine("Invalid item number. Please try again.");
+        }
+        Console.WriteLine("Press Enter to continue...");
+        Console.ReadLine();
     }
 
     private void RemoveProduct()
@@ -369,5 +440,49 @@ internal class App
         DisplayInventoryList(inventory);
         Console.WriteLine("Press Enter to return...");
         Console.ReadLine();
+    }
+
+    public void ViewOrEditCart()
+    {
+        ResetConsole();
+        var cart = _cartService.ListCartItems();
+
+        if (!cart.Any())
+        {
+            Console.WriteLine("Cart is empty. Press Enter to return...");
+            Console.ReadLine();
+            return;
+        }
+
+        Console.WriteLine("=== CART ===");
+        DisplayCartList(cart);
+        Console.WriteLine();
+        Console.WriteLine("1. Checkout");
+        Console.WriteLine("2. Edit Item Quantity");
+        Console.WriteLine("3. Remove Item");
+        Console.WriteLine("4. Return to Main Menu");
+        Console.Write("\nChoose an option: ");
+        var choice = Console.ReadLine();
+
+        switch (choice)
+        {
+            case "1":
+                Checkout();
+                break;
+            case "2":
+                EditCartItemQuantity();
+                break;
+            case "3":
+                RemoveCartItem();
+                break;
+            case "4":
+                Environment.Exit(0);
+                return;
+            default:
+                Console.WriteLine("Invalid option. Press Enter to continue...");
+                Console.ReadLine();
+                break;
+        }
+
     }
 }
