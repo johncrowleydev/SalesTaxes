@@ -8,14 +8,12 @@ internal class App
 {
     private readonly ICartService _cartService;
     private readonly IInventoryService _inventoryService;
-    private readonly ISalesTaxService _salesTaxService;
     private readonly ISessionService _sessionService;
 
-    public App(ICartService cartService, IInventoryService inventoryService, ISalesTaxService salesTaxService, ISessionService sessionService)
+    public App(ICartService cartService, IInventoryService inventoryService, ISessionService sessionService)
     {
         _cartService = cartService;
         _inventoryService = inventoryService;
-        _salesTaxService = salesTaxService;
         _sessionService = sessionService;
     }
 
@@ -108,44 +106,19 @@ internal class App
 
     private void Checkout()
     {
-        //ResetConsole();
-        //var cart = _cartService.ListCartItems();
-
-        //if (!cart.Any())
-        //{
-        //    Console.WriteLine("Cart is empty. Press Enter to return...");
-        //    Console.ReadLine();
-        //    return;
-        //}
-
-        //Console.Write("Enter your state: ");
-        //var state = Console.ReadLine();
-        //var isTaxFreeState = state?.StartsWith("M", StringComparison.OrdinalIgnoreCase) ?? false;
-
-        //decimal totalSalesTaxes = 0;
-        //decimal totalCost = 0;
-
-        //Console.WriteLine("=== Receipt ===");
-        //foreach (var item in cart)
-        //{
-        //    decimal salesTaxPerItem = _salesTaxService.CalculateSalesTax(item.Product, isTaxFreeState);
-        //    decimal itemTotalPricePerUnit = item.Product.Price + salesTaxPerItem;
-
-        //    decimal itemTotalPrice = itemTotalPricePerUnit * item.Quantity;
-        //    decimal itemTotalSalesTax = salesTaxPerItem * item.Quantity;
-
-        //    totalSalesTaxes += itemTotalSalesTax;
-        //    totalCost += itemTotalPrice;
-
-        //    Console.WriteLine($"{item.Quantity} x {item.Product.Name}: {itemTotalPrice:C2} ({item.Quantity} @ {itemTotalPricePerUnit:C2} each)");
-        //}
-
-        //Console.WriteLine($"Sales Taxes: {totalSalesTaxes:C2}");
-        //Console.WriteLine($"Total: {totalCost:C2}");
-
-        //_cartService.ClearCartItems();
-        //Console.WriteLine("Press Enter to return...");
-        //Console.ReadLine();
+        ResetConsole();
+        var receipt = _cartService.GenerateReceipt();
+        Console.WriteLine("=== RECEIPT ===");
+        foreach (var item in receipt.LineItems)
+            Console.WriteLine($"{item.Quantity} x {item.Product.Name}: {item.Total:C2} ({item.Quantity} @ {item.Subtotal:C2} + {item.SalesTaxTotal:C2} sales tax)");
+        Console.WriteLine($"Subtotal: {receipt.Subtotal:C2}");
+        Console.WriteLine($"Sales Tax: {receipt.SalesTaxTotal:C2}");
+        Console.WriteLine($"Total: {receipt.Total:C2}");
+        Console.WriteLine();
+        Console.WriteLine("Thank you for your purchase. Come again!");
+        _cartService.ClearCartItems();
+        Console.WriteLine("Press Enter to return...");
+        Console.ReadLine();
     }
 
     private static void DisplayCartList(IList<CartItemDTO> cart, bool showLineNumbers = false)
@@ -476,7 +449,6 @@ internal class App
                 RemoveCartItem();
                 break;
             case "4":
-                Environment.Exit(0);
                 return;
             default:
                 Console.WriteLine("Invalid option. Press Enter to continue...");
